@@ -1,9 +1,9 @@
 services:
   - type: web
     name: temperature-prediction-api
-    env: python
+    runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: cd summative/API && uvicorn prediction:app --host 0.0.0.0 --port $PORT
+    startCommand: cd summative/API && PYTHONPATH=$PYTHONPATH:. uvicorn prediction:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0 
