@@ -3,6 +3,7 @@ from sklearn.linear_model import LinearRegression
 import pickle
 from pathlib import Path
 import logging
+import os
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -32,6 +33,9 @@ def create_sample_model():
             pickle.dump(model, f)
         
         logger.info(f"Model saved successfully to {model_path}")
+        logger.info(f"Model path exists: {model_path.exists()}")
+        logger.info(f"Model path is absolute: {model_path.is_absolute()}")
+        logger.info(f"Current working directory: {os.getcwd()}")
         
         # Test the saved model
         with open(model_path, "rb") as f:
@@ -44,6 +48,7 @@ def create_sample_model():
         return True
     except Exception as e:
         logger.error(f"Error creating model: {e}")
+        logger.error(f"Current working directory: {os.getcwd()}")
         return False
 
 if __name__ == "__main__":
