@@ -64,15 +64,14 @@ except Exception as e:
     model = None
 
 class PredictionInput(BaseModel):
-    features: List[float] = Field(..., min_length=4, max_length=4, description="List of 4 features for prediction")
+    features: List[float] = Field(..., min_items=4, max_items=4, description="List of 4 features for prediction")
     
-    model_config = {
-        "json_schema_extra": {
+    class Config:
+        schema_extra = {
             "example": {
                 "features": [0.5, 0.3, 0.2, 0.1]
             }
         }
-    }
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
