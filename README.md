@@ -24,7 +24,6 @@ The dataset contains global temperature anomalies from 1880 to present, combinin
 ### Model Visualizations Explanation
 
 #### Temperature Anomaly Trends and Predictions
-![Temperature Anomalies]
 *Historical temperature anomalies and future projections showing the model's linear fit*
 
 The graph above demonstrates:
@@ -34,7 +33,6 @@ The graph above demonstrates:
 - Model's ability to capture long-term temperature trends
 
 #### Feature Correlations
-![Correlation Heatmap]
 *Heatmap showing correlations between environmental features and temperature anomalies*
 
 Key insights from the correlation analysis:
@@ -43,7 +41,6 @@ Key insights from the correlation analysis:
 - Complex interactions between atmospheric pressure and other variables
 
 #### Model Performance Comparison
-![Model Comparison]
 *Comparison of different models' performance using Mean Squared Error (MSE)*
 
 Performance metrics:
