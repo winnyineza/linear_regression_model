@@ -1,49 +1,141 @@
-# Global Temperature Anomaly Predictor
+# Global Temperature Anomaly Prediction API
 
-This project predicts global temperature anomalies using machine learning models. It includes a trained model, API endpoint, and Flutter mobile application.
+This FastAPI application provides endpoints for predicting global temperature anomalies using a machine learning model.
 
-## Project Structure
+## Setup and Installation
 
-```
-linear_regression_model/
-├── summative/
-│   ├── linear_regression/
-│   │   ├── multivariate.ipynb
-│   ├── API/
-│   │   ├── main.py
-│   │   ├── requirements.txt
-│   ├── FlutterApp/
+1. Clone the repository
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
 ```
 
-## API Endpoint
+## Running the API Locally
 
-Public API URL: [YOUR_RENDER_URL_HERE]
+Start the API server:
+```bash
+uvicorn main:app --reload
+```
 
-The API accepts POST requests at `/predict` with the following format:
+The API will be available at `http://localhost:8000`
+
+## API Documentation
+
+Once the server is running, you can access:
+- Interactive API docs (Swagger UI): `http://localhost:8000/docs`
+- Alternative API docs (ReDoc): `http://localhost:8000/redoc`
+
+## API Endpoints
+
+### 1. Root Endpoint
+```http
+GET /
+```
+
+Returns API information and status.
+
+Example response:
 ```json
 {
-    "year": 2025
+    "message": "Welcome to the Global Temperature Anomaly Prediction API",
+    "model_loaded": true,
+    "version": "1.0.0",
+    "working_directory": "/path/to/working/directory",
+    "model_path": "/path/to/model.pkl",
+    "model_exists": true,
+    "python_version": "3.x.x",
+    "python_executable": "/path/to/python"
 }
 ```
 
-## Running the Mobile App
+### 2. Prediction Endpoint
+```http
+POST /predict
+```
 
-1. Install Flutter SDK (https://flutter.dev/docs/get-started/install)
-2. Clone this repository
-3. Navigate to the FlutterApp directory
-4. Run `flutter pub get` to install dependencies
-5. Update the API endpoint in `lib/screens/prediction_screen.dart`
-6. Run `flutter run` to start the app
+Make a prediction using the model.
 
-## Video Demo
+Request body:
+```json
+{
+    "features": [0.5, 0.3, 0.2, 0.1]
+}
+```
 
-Watch the project demonstration: [YOUR_YOUTUBE_LINK_HERE]
+Example response:
+```json
+{
+    "prediction": 0.42,
+    "input_features": [0.5, 0.3, 0.2, 0.1],
+    "status": "success"
+}
+```
 
-## Model Performance
+## Testing the API
 
-The project compares three models:
-- Linear Regression
-- Decision Trees
-- Random Forest
+### Using the Test Script
 
-[Add your model performance comparison results here] 
+Run the provided test script to verify all endpoints:
+```bash
+python test_api.py
+```
+
+### Using cURL
+
+1. Test the root endpoint:
+```bash
+curl http://localhost:8000/
+```
+
+2. Make a prediction:
+```bash
+curl -X POST http://localhost:8000/predict \
+     -H "Content-Type: application/json" \
+     -d '{"features": [0.5, 0.3, 0.2, 0.1]}'
+```
+
+### Using Python requests
+
+```python
+import requests
+
+# Test root endpoint
+response = requests.get("http://localhost:8000/")
+print(response.json())
+
+# Make a prediction
+data = {"features": [0.5, 0.3, 0.2, 0.1]}
+response = requests.post("http://localhost:8000/predict", json=data)
+print(response.json())
+```
+
+## Error Handling
+
+The API includes comprehensive error handling for various scenarios:
+
+1. Invalid input (400 Bad Request)
+2. Model not loaded (503 Service Unavailable)
+3. Server errors (500 Internal Server Error)
+
+Example error response:
+```json
+{
+    "detail": "Invalid input: Input must contain exactly 4 features"
+}
+```
+
+## Deployment
+
+The API is configured for deployment on Render. The following files are used for deployment:
+
+- `render.yaml`: Deployment configuration
+- `Procfile`: Process configuration for the web service
+- `requirements.txt`: Python dependencies
+
+## Logging
+
+The API includes comprehensive logging for debugging and monitoring:
+- Application startup information
+- Model loading status
+- Request processing
+- Error details and stack traces 
