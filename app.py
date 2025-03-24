@@ -6,6 +6,11 @@ import numpy as np
 from typing import List
 import os
 from pathlib import Path
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -27,13 +32,17 @@ app.add_middleware(
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR / "summative" / "linear_regression" / "best_model.pkl"
 
+logger.info(f"Current working directory: {os.getcwd()}")
+logger.info(f"Base directory: {BASE_DIR}")
+logger.info(f"Looking for model at: {MODEL_PATH}")
+
 # Load the model
 try:
     with open(MODEL_PATH, "rb") as f:
         model = pickle.load(f)
-    print(f"Model loaded successfully from {MODEL_PATH}")
+    logger.info(f"Model loaded successfully from {MODEL_PATH}")
 except Exception as e:
-    print(f"Error loading model from {MODEL_PATH}: {e}")
+    logger.error(f"Error loading model from {MODEL_PATH}: {e}")
     model = None
 
 class PredictionInput(BaseModel):
@@ -52,7 +61,9 @@ async def root():
     return {
         "message": "Welcome to the Global Temperature Anomaly Prediction API",
         "model_loaded": model is not None,
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "working_directory": os.getcwd(),
+        "model_path": str(MODEL_PATH)
     }
 
 @app.post("/predict")
@@ -74,6 +85,7 @@ async def predict(input_data: PredictionInput):
             "status": "success"
         }
     except Exception as e:
+        logger.error(f"Prediction error: {str(e)}")
         raise HTTPException(
             status_code=400,
             detail=f"Prediction error: {str(e)}"
