@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Dict
 from .models.model import TemperaturePredictor
 
 # Initialize predictor
@@ -24,65 +24,96 @@ app.add_middleware(
 )
 
 class PredictionInput(BaseModel):
-    features: List[float] = Field(
-        ...,
-        description="List of 4 features: [CO2 Concentration, Solar Activity, Ocean Temperature, Atmospheric Pressure]",
-        min_items=4,
-        max_items=4,
-        example=[0.5, 0.3, 0.2, 0.1]
-    )
-
-    @property
-    def feature_names(self):
-        return ["CO2 Concentration", "Solar Activity", "Ocean Temperature", "Atmospheric Pressure"]
+    features: List[float]
 
     class Config:
-        json_schema_extra = {
+        schema_extra = {
             "example": {
-                "features": [0.5, 0.3, 0.2, 0.1]
+                "features": [0.2, 0.5, 0.7, 0.3]
             }
         }
 
+FEATURE_NAMES = [
+    "CO2 Concentration",
+    "Solar Activity",
+    "Ocean Temperature",
+    "Atmospheric Pressure"
+]
+
+FEATURE_RANGES = {
+    "CO2 Concentration": {"min": 0.0, "max": 1.0},
+    "Solar Activity": {"min": 0.0, "max": 1.0},
+    "Ocean Temperature": {"min": 0.0, "max": 1.0},
+    "Atmospheric Pressure": {"min": 0.0, "max": 1.0}
+}
+
 @app.get("/")
-async def root():
-    """Root endpoint returning API information"""
+def root() -> Dict:
     return {
         "message": "Welcome to the Global Temperature Anomaly Prediction API",
         "model_loaded": predictor.is_loaded,
         "version": "1.0.0",
         "endpoints": {
             "docs": "/docs",
-            "predict": "/predict"
+            "predict": "/predict",
+            "model-info": "/model-info",
+            "validate": "/validate"
         }
     }
 
 @app.post("/predict")
-async def predict(input_data: PredictionInput):
-    """Make a prediction using the loaded model"""
-    if not predictor.is_loaded:
-        raise HTTPException(
-            status_code=500,
-            detail="Model not loaded. Please check server logs."
-        )
+def predict(input_data: PredictionInput):
+    if len(input_data.features) != 4:
+        raise HTTPException(status_code=400, detail="Exactly 4 features are required")
     
     try:
-        # Validate input ranges
-        for i, value in enumerate(input_data.features):
-            if not 0 <= value <= 1:
-                raise ValueError(
-                    f"{input_data.feature_names[i]} must be between 0 and 1, got {value}"
-                )
-        
-        # Make prediction
         prediction = predictor.predict(input_data.features)
-        
         return {
             "prediction": prediction,
-            "input_features": input_data.features,
-            "feature_names": input_data.feature_names,
+            "input_features": {
+                FEATURE_NAMES[i]: input_data.features[i]
+                for i in range(len(FEATURE_NAMES))
+            },
             "status": "success"
         }
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}") 
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/model-info")
+def model_info():
+    return {
+        "feature_names": FEATURE_NAMES,
+        "feature_ranges": FEATURE_RANGES,
+        "model_loaded": predictor.is_loaded,
+        "output_description": "Temperature Anomaly (°C)",
+        "model_type": "Linear Regression"
+    }
+
+@app.post("/validate")
+def validate_features(input_data: PredictionInput):
+    if len(input_data.features) != 4:
+        return {
+            "valid": False,
+            "errors": ["Exactly 4 features are required"]
+        }
+    
+    errors = []
+    for i, value in enumerate(input_data.features):
+        feature_name = FEATURE_NAMES[i]
+        range_info = FEATURE_RANGES[feature_name]
+        if value < range_info["min"] or value > range_info["max"]:
+            errors.append(
+                f"{feature_name} must be between {range_info['min']} and {range_info['max']}"
+            )
+    
+    return {
+        "valid": len(errors) == 0,
+        "errors": errors if errors else None,
+        "validated_features": {
+            FEATURE_NAMES[i]: {
+                "value": input_data.features[i],
+                "in_range": range_info["min"] <= input_data.features[i] <= range_info["max"]
+            }
+            for i, range_info in enumerate(FEATURE_RANGES.values())
+        }
+    } 

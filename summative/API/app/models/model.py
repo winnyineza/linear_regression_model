@@ -6,7 +6,12 @@ from typing import List
 class TemperaturePredictor:
     def __init__(self):
         self.model = None
-        self.model_path = os.path.join(os.path.dirname(__file__), "best_model.pkl")
+        # Get the absolute path to the model file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        self.model_path = os.path.join(current_dir, "best_model.pkl")
+        print(f"Current directory: {current_dir}")
+        print(f"Looking for model at: {self.model_path}")
+        print(f"Directory contents: {os.listdir(current_dir)}")
         self.load_model()
     
     def load_model(self):
@@ -20,7 +25,7 @@ class TemperaturePredictor:
     
     def predict(self, features: List[float]) -> float:
         if self.model is None:
-            raise ValueError("Model not loaded")
+            raise ValueError(f"Model not loaded. Tried path: {self.model_path}")
         
         features_array = np.array(features).reshape(1, -1)
         return float(self.model.predict(features_array)[0])
