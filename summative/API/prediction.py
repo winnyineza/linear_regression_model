@@ -1,48 +1,68 @@
-import numpy as np
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import pickle
+import numpy as np
+from typing import List
+import os
 
-def load_model(model_path='best_model.pkl'):
-    """Load the trained model"""
+app = FastAPI(
+    title="Global Temperature Anomaly Prediction API",
+    description="API for predicting global temperature anomalies using machine learning models",
+    version="1.0.0"
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
+# Load the model
+try:
+    model_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'linear_regression', 'best_model.pkl')
     with open(model_path, 'rb') as f:
-        return pickle.load(f)
+        model = pickle.load(f)
+except Exception as e:
+    print(f"Error loading model: {e}")
+    model = None
 
-def predict_temperature(year, model_info=None):
-    """
-    Predict temperature anomaly for a given year
+class PredictionInput(BaseModel):
+    features: List[float]
     
-    Parameters:
-    year: Year to predict for
-    model_info: Loaded model information
+    class Config:
+        schema_extra = {
+            "example": {
+                "features": [0.5, 0.3, 0.2, 0.1]  # Example input features
+            }
+        }
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the Global Temperature Anomaly Prediction API"}
+
+@app.post("/predict")
+async def predict(input_data: PredictionInput):
+    if model is None:
+        raise HTTPException(status_code=500, detail="Model not loaded")
     
-    Returns:
-    prediction: Predicted temperature anomaly
-    """
-    if model_info is None:
-        model_info = load_model()
-    
-    # Check if it's a gradient descent model or scikit-learn model
-    if isinstance(model_info, dict) and 'theta' in model_info:
-        # Gradient Descent model
-        theta = model_info['theta']
-        X_mean = model_info['X_mean']
-        X_std = model_info['X_std']
+    try:
+        # Convert input features to numpy array and reshape for prediction
+        features = np.array(input_data.features).reshape(1, -1)
         
-        # Normalize input
-        year_norm = (year - X_mean) / X_std
-        # Add intercept term
-        X_pred = np.array([1, year_norm])
         # Make prediction
-        prediction = X_pred.dot(theta)
-    else:
-        # Scikit-learn model
-        X_pred = np.array([[year, year**2]])
-        prediction = model_info.predict(X_pred)[0]
-    
-    return prediction
+        prediction = model.predict(features)[0]
+        
+        return {
+            "prediction": float(prediction),
+            "input_features": input_data.features
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 if __name__ == "__main__":
-    # Example usage
-    model_info = load_model()
-    current_year = 2025
-    prediction = predict_temperature(current_year, model_info)
-    print(f"Predicted temperature anomaly for {current_year}: {prediction:.4f}°C")
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

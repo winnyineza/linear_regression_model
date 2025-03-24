@@ -188,13 +188,13 @@
       "languageVersion": "3.4"
     },
     {
-      "name": "temperature_anomaly_predictor",
+      "name": "temperature_predictor",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     }
   ],
-  "generated": "2025-03-24T09:39:13.828800Z",
+  "generated": "2025-03-24T10:17:50.243359Z",
   "generator": "pub",
   "generatorVersion": "3.4.4",
   "flutterRoot": "file:///C:/flutter",

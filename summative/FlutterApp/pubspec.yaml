@@ -1,5 +1,5 @@
-name: temperature_anomaly_predictor
-description: A Flutter app for predicting global temperature anomalies
+name: temperature_predictor
+description: A Flutter app for predicting temperature anomalies.
 publish_to: 'none'
 version: 1.0.0+1
 
