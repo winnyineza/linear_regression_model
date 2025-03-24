@@ -21,10 +21,10 @@ The dataset contains global temperature anomalies from 1880 to present, combinin
 - Ocean Temperature (normalized 0-1)
 - Atmospheric Pressure (normalized 0-1)
 
-### Model Visualizations
+### Model Visualizations Explanation
 
 #### Temperature Anomaly Trends and Predictions
-![Temperature Anomalies](screenshots/linear_fit.png)
+![Temperature Anomalies]
 *Historical temperature anomalies and future projections showing the model's linear fit*
 
 The graph above demonstrates:
@@ -34,7 +34,7 @@ The graph above demonstrates:
 - Model's ability to capture long-term temperature trends
 
 #### Feature Correlations
-![Correlation Heatmap](screenshots/correlation_heatmap.png)
+![Correlation Heatmap]
 *Heatmap showing correlations between environmental features and temperature anomalies*
 
 Key insights from the correlation analysis:
@@ -43,7 +43,7 @@ Key insights from the correlation analysis:
 - Complex interactions between atmospheric pressure and other variables
 
 #### Model Performance Comparison
-![Model Comparison](screenshots/model_comparison.png)
+![Model Comparison]
 *Comparison of different models' performance using Mean Squared Error (MSE)*
 
 Performance metrics:
