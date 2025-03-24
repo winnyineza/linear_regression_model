@@ -9,6 +9,7 @@ import logging
 from pathlib import Path
 import sys
 import os
+from typing import List
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -58,51 +59,43 @@ except Exception as e:
     logger.error(f"Model path is absolute: {MODEL_PATH.is_absolute()}")
 
 class PredictionInput(BaseModel):
-    features: list = Field(..., min_items=4, max_items=4, description="List of 4 features for prediction")
-
+    features: List[float]
+    
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "features": [0.5, 0.3, 0.2, 0.1]
             }
         }
 
-@app.get("/", response_class=HTMLResponse)
-async def read_root():
-    """Serve the HTML frontend"""
-    try:
-        with open("index.html", "r") as f:
-            return f.read()
-    except Exception as e:
-        logger.error(f"Error reading index.html: {e}")
-        raise HTTPException(status_code=500, detail="Error loading frontend")
-
-@app.get("/api/", response_class=JSONResponse)
-async def api_root():
-    """API root endpoint"""
+@app.get("/")
+async def root():
+    """Root endpoint returning API information"""
     return {
         "message": "Welcome to the Global Temperature Anomaly Prediction API",
         "model_loaded": model is not None,
         "version": "1.0.0",
-        "working_directory": str(os.getcwd()),
-        "model_path": str(MODEL_PATH),
-        "model_exists": MODEL_PATH.exists(),
-        "python_executable": sys.executable
+        "endpoints": {
+            "docs": "/docs",
+            "predict": "/predict"
+        }
     }
 
-@app.post("/predict", response_class=JSONResponse)
+@app.post("/predict")
 async def predict(input_data: PredictionInput):
     """Make a prediction using the loaded model"""
+    if model is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Model not loaded. Please check server logs."
+        )
+    
     try:
-        if model is None:
-            raise HTTPException(status_code=500, detail="Model not loaded")
-        
+        # Convert input features to numpy array and reshape for prediction
         features = np.array(input_data.features).reshape(1, -1)
-        logger.info(f"Received input features: {input_data.features}")
-        logger.info(f"Reshaped features: {features.shape}")
         
+        # Make prediction
         prediction = model.predict(features)[0]
-        logger.info(f"Generated prediction: {prediction}")
         
         return {
             "prediction": float(prediction),
@@ -110,8 +103,10 @@ async def predict(input_data: PredictionInput):
             "status": "success"
         }
     except Exception as e:
-        logger.error(f"Error making prediction: {e}")
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
 
 if __name__ == "__main__":
     import uvicorn

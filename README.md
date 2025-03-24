@@ -1,141 +1,87 @@
-# Global Temperature Anomaly Prediction API
+# Global Temperature Anomaly Prediction
 
-This FastAPI application provides endpoints for predicting global temperature anomalies using a machine learning model.
+This project implements a machine learning model to predict global temperature anomalies based on various environmental factors. The project consists of a machine learning model, a FastAPI backend, and a Flutter frontend application.
 
-## Setup and Installation
+## Project Structure
+```
+linear_regression_model/
+├── summative/
+│   ├── linear_regression/
+│   │   ├── multivariate.ipynb
+│   ├── API/
+│   │   ├── main.py
+│   │   ├── requirements.txt
+│   │   ├── Procfile
+│   ├── FlutterApp/
+```
 
-1. Clone the repository
-2. Install dependencies:
+## API Endpoint
+The prediction API is hosted on Render and available at:
+https://temperature-anomaly-api.onrender.com
+
+You can test the API using Swagger UI at:
+https://temperature-anomaly-api.onrender.com/docs
+
+### API Usage Example
 ```bash
-pip install -r requirements.txt
-```
-
-## Running the API Locally
-
-Start the API server:
-```bash
-uvicorn main:app --reload
-```
-
-The API will be available at `http://localhost:8000`
-
-## API Documentation
-
-Once the server is running, you can access:
-- Interactive API docs (Swagger UI): `http://localhost:8000/docs`
-- Alternative API docs (ReDoc): `http://localhost:8000/redoc`
-
-## API Endpoints
-
-### 1. Root Endpoint
-```http
-GET /
-```
-
-Returns API information and status.
-
-Example response:
-```json
-{
-    "message": "Welcome to the Global Temperature Anomaly Prediction API",
-    "model_loaded": true,
-    "version": "1.0.0",
-    "working_directory": "/path/to/working/directory",
-    "model_path": "/path/to/model.pkl",
-    "model_exists": true,
-    "python_version": "3.x.x",
-    "python_executable": "/path/to/python"
-}
-```
-
-### 2. Prediction Endpoint
-```http
-POST /predict
-```
-
-Make a prediction using the model.
-
-Request body:
-```json
-{
-    "features": [0.5, 0.3, 0.2, 0.1]
-}
-```
-
-Example response:
-```json
-{
-    "prediction": 0.42,
-    "input_features": [0.5, 0.3, 0.2, 0.1],
-    "status": "success"
-}
-```
-
-## Testing the API
-
-### Using the Test Script
-
-Run the provided test script to verify all endpoints:
-```bash
-python test_api.py
-```
-
-### Using cURL
-
-1. Test the root endpoint:
-```bash
-curl http://localhost:8000/
-```
-
-2. Make a prediction:
-```bash
-curl -X POST http://localhost:8000/predict \
-     -H "Content-Type: application/json" \
-     -d '{"features": [0.5, 0.3, 0.2, 0.1]}'
-```
-
-### Using Python requests
-
-```python
-import requests
-
-# Test root endpoint
-response = requests.get("http://localhost:8000/")
-print(response.json())
+# Get API information
+curl https://temperature-anomaly-api.onrender.com/
 
 # Make a prediction
-data = {"features": [0.5, 0.3, 0.2, 0.1]}
-response = requests.post("http://localhost:8000/predict", json=data)
-print(response.json())
+curl -X POST https://temperature-anomaly-api.onrender.com/predict \
+  -H "Content-Type: application/json" \
+  -d '{"features": [0.5, 0.3, 0.2, 0.1]}'
 ```
 
-## Error Handling
+## Running the Flutter App
 
-The API includes comprehensive error handling for various scenarios:
+### Prerequisites
+1. Flutter SDK (>=3.0.0)
+2. Dart SDK
+3. A web browser (Microsoft Edge or Chrome recommended)
 
-1. Invalid input (400 Bad Request)
-2. Model not loaded (503 Service Unavailable)
-3. Server errors (500 Internal Server Error)
-
-Example error response:
-```json
-{
-    "detail": "Invalid input: Input must contain exactly 4 features"
-}
+### Installation Steps
+1. Clone this repository:
+```bash
+git clone [your-repo-url]
+cd temperature_predictor_flutter
 ```
 
-## Deployment
+2. Install dependencies:
+```bash
+flutter pub get
+```
 
-The API is configured for deployment on Render. The following files are used for deployment:
+3. Run the app:
+```bash
+# For Microsoft Edge
+flutter run -d edge --web-browser-flag="--disable-web-security"
 
-- `render.yaml`: Deployment configuration
-- `Procfile`: Process configuration for the web service
-- `requirements.txt`: Python dependencies
+# For Chrome
+flutter run -d chrome --web-browser-flag="--disable-web-security"
+```
 
-## Logging
+### Using the App
+1. Launch the app using the commands above
+2. Input values using the sliders:
+   - CO2 Concentration (0-1)
+   - Solar Activity (0-1)
+   - Ocean Temperature (0-1)
+   - Atmospheric Pressure (0-1)
+3. Click "Generate Prediction" to get the temperature anomaly prediction
+4. View the radar chart visualization of your inputs
+5. Check the prediction history below
 
-The API includes comprehensive logging for debugging and monitoring:
-- Application startup information
-- Model loading status
-- Request processing
-- Error details and stack traces 
+## Model Performance
+The project compares three different models:
+- Linear Regression
+- Decision Trees
+- Random Forest
+
+The Linear Regression model was chosen as the best performing model based on:
+- Lower Mean Squared Error (MSE)
+- Better generalization on test data
+- Simpler model architecture suitable for the linear nature of temperature anomaly predictions
+
+## Video Demo
+[Video link will be added] 
