@@ -7,10 +7,19 @@ from typing import List
 import os
 from pathlib import Path
 import logging
+import sys
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
+
+# Log Python version and environment
+logger.info(f"Python version: {sys.version}")
+logger.info(f"Python executable: {sys.executable}")
+logger.info(f"Current working directory: {os.getcwd()}")
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -32,9 +41,9 @@ app.add_middleware(
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR / "summative" / "linear_regression" / "best_model.pkl"
 
-logger.info(f"Current working directory: {os.getcwd()}")
 logger.info(f"Base directory: {BASE_DIR}")
 logger.info(f"Looking for model at: {MODEL_PATH}")
+logger.info(f"Model file exists: {MODEL_PATH.exists()}")
 
 # Load the model
 try:
@@ -63,7 +72,10 @@ async def root():
         "model_loaded": model is not None,
         "version": "1.0.0",
         "working_directory": os.getcwd(),
-        "model_path": str(MODEL_PATH)
+        "model_path": str(MODEL_PATH),
+        "model_exists": MODEL_PATH.exists(),
+        "python_version": sys.version,
+        "python_executable": sys.executable
     }
 
 @app.post("/predict")
