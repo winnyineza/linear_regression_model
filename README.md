@@ -2,6 +2,55 @@
 
 This project implements a machine learning model to predict global temperature anomalies based on various environmental factors. The project consists of a machine learning model, a FastAPI backend, and a Flutter frontend application.
 
+## Mission Statement
+
+Our mission is to provide an accessible tool for understanding and predicting global temperature anomalies using machine learning. By analyzing key environmental factors, we aim to contribute to climate change awareness and research.
+
+## Dataset Description
+
+### Source
+The dataset is sourced from NASA's Goddard Institute for Space Studies (GISS) Surface Temperature Analysis (GISTEMP v4):
+[GISTEMP Dataset](https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv)
+
+### Overview
+The dataset contains global temperature anomalies from 1880 to present, combining land-surface air and sea-surface water temperature anomalies. The temperature anomalies are measured in degrees Celsius relative to the 1951-1980 base period means.
+
+### Features
+- CO2 Concentration (normalized 0-1)
+- Solar Activity (normalized 0-1)
+- Ocean Temperature (normalized 0-1)
+- Atmospheric Pressure (normalized 0-1)
+
+### Model Visualizations
+
+#### Temperature Anomaly Trends and Predictions
+![Temperature Anomalies](screenshots/linear_fit.png)
+*Historical temperature anomalies and future projections showing the model's linear fit*
+
+The graph above demonstrates:
+- Historical temperature data (blue) from 1875 to present
+- Model predictions (red) showing future temperature anomaly projections
+- Clear upward trend in global temperature anomalies
+- Model's ability to capture long-term temperature trends
+
+#### Feature Correlations
+![Correlation Heatmap](screenshots/correlation_heatmap.png)
+*Heatmap showing correlations between environmental features and temperature anomalies*
+
+Key insights from the correlation analysis:
+- Strong positive correlation between CO2 levels and temperature anomalies
+- Moderate correlation between ocean temperatures and overall anomalies
+- Complex interactions between atmospheric pressure and other variables
+
+#### Model Performance Comparison
+![Model Comparison](screenshots/model_comparison.png)
+*Comparison of different models' performance using Mean Squared Error (MSE)*
+
+Performance metrics:
+- Linear Regression: Best overall performance with lowest MSE
+- Random Forest: Good performance but more complex
+- Decision Trees: Simple but less accurate for this dataset
+
 ## App UI Design
 
 The application features a modern, user-friendly interface designed for ease of use and clear data visualization.
