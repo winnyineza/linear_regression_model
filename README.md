@@ -1,10 +1,14 @@
 # Global Temperature Anomaly Prediction
 
 This project implements a machine learning model to predict global temperature anomalies based on various environmental factors. The project consists of a machine learning model, a FastAPI backend, and a Flutter frontend application.
+
 ## App UI Design
-image.png
 
+The application features a modern, user-friendly interface designed for ease of use and clear data visualization.
 
+| Welcome Screen | Input Form | Form with Values | Results | History |
+|:---:|:---:|:---:|:---:|:---:|
+| <img src="screenshots/Home%20Screen.jpg" width="150"/> | <img src="screenshots/Screen%202%20.jpg" width="150"/> | <img src="screenshots/Screen%202%20with%20values.jpg" width="150"/> | <img src="screenshots/Result%20Screen.jpg" width="150"/> | <img src="screenshots/Prediction%20History.jpg" width="150"/> |
 
 ## Project Structure
 ```
@@ -89,3 +93,64 @@ The Linear Regression model was chosen as the best performing model based on:
 
 ## Video Demo
 [Demo Video](https://docs.google.com/document/d/13s9qF54S_UDDHkaU5DtYedcdbeR6waaSgwVnuCjj-v0/edit?usp=sharing)
+
+## Features
+
+- Real-time temperature anomaly predictions
+- Input validation for environmental factors
+- Beautiful data visualization
+- Prediction history tracking
+- Modern, responsive design
+
+## Technical Details
+
+### Frontend (Flutter)
+- Material Design 3.0
+- Interactive data input forms
+- Real-time validation
+- Graph visualization using FL Chart
+- Cross-platform compatibility
+
+### Backend (FastAPI)
+- RESTful API endpoints
+- Machine learning model integration
+- Data validation using Pydantic
+- CORS support for web clients
+- Swagger UI documentation
+
+## API Documentation
+
+The API is hosted at: https://temperature-anomaly-api.onrender.com/docs
+
+Available endpoints:
+- `/predict` - Make temperature predictions
+- `/` - API information
+- `/docs` - Swagger documentation
+
+## Installation and Setup
+
+```bash
+# Clone the repository
+git clone [repository-url]
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the API
+uvicorn main:app --reload
+
+# Run the Flutter app
+cd temperature_predictor_flutter
+flutter run
+```
+
+## Model Performance
+
+The model has been trained on environmental data and achieves:
+- High accuracy in temperature anomaly predictions
+- Low mean squared error
+- Good generalization to new data
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
