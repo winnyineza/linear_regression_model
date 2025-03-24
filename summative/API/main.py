@@ -22,8 +22,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load model
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "models", "best_model.pkl")
+# Load model - look for model file in the same directory as main.py
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "best_model.pkl")
+print(f"Looking for model at: {MODEL_PATH}")
+print(f"Current working directory: {os.getcwd()}")
+print(f"Directory contents: {os.listdir(os.path.dirname(__file__))}")
 
 try:
     with open(MODEL_PATH, "rb") as f:
@@ -61,6 +64,8 @@ async def root():
         "model_loaded": model is not None,
         "version": "1.0.0",
         "model_path": MODEL_PATH,
+        "current_directory": os.getcwd(),
+        "directory_contents": os.listdir(os.path.dirname(__file__)),
         "endpoints": {
             "docs": "/docs",
             "predict": "/predict"
