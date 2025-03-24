@@ -10,6 +10,7 @@ from pathlib import Path
 import logging
 import sys
 import traceback
+import warnings
 
 # Set up logging
 logging.basicConfig(
@@ -17,6 +18,9 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Suppress scikit-learn version mismatch warnings
+warnings.filterwarnings('ignore', category=UserWarning)
 
 # Log Python version and environment
 logger.info(f"Python version: {sys.version}")
@@ -52,19 +56,23 @@ try:
     with open(MODEL_PATH, "rb") as f:
         model = pickle.load(f)
     logger.info(f"Model loaded successfully from {MODEL_PATH}")
+    logger.info(f"Model type: {type(model)}")
+    logger.info(f"Model attributes: {dir(model)}")
 except Exception as e:
     logger.error(f"Error loading model from {MODEL_PATH}: {e}")
+    logger.error(traceback.format_exc())
     model = None
 
 class PredictionInput(BaseModel):
-    features: List[float] = Field(..., min_items=4, max_items=4, description="List of 4 features for prediction")
+    features: List[float] = Field(..., min_length=4, max_length=4, description="List of 4 features for prediction")
     
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "features": [0.5, 0.3, 0.2, 0.1]
             }
         }
+    }
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -111,8 +119,22 @@ async def predict(input_data: PredictionInput):
         )
     
     try:
+        logger.info(f"Received input features: {input_data.features}")
         features = np.array(input_data.features).reshape(1, -1)
-        prediction = model.predict(features)[0]
+        logger.info(f"Reshaped features: {features.shape}")
+        
+        # Check if model has predict method
+        if not hasattr(model, 'predict'):
+            raise ValueError("Model does not have predict method")
+            
+        # Try to make prediction
+        try:
+            prediction = model.predict(features)[0]
+            logger.info(f"Generated prediction: {prediction}")
+        except Exception as e:
+            logger.error(f"Error during prediction: {e}")
+            logger.error(traceback.format_exc())
+            raise ValueError(f"Error during prediction: {str(e)}")
         
         return {
             "prediction": float(prediction),
@@ -121,6 +143,7 @@ async def predict(input_data: PredictionInput):
         }
     except ValueError as e:
         logger.error(f"Value error in prediction: {str(e)}")
+        logger.error(traceback.format_exc())
         raise HTTPException(
             status_code=400,
             detail=f"Invalid input: {str(e)}"
