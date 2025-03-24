@@ -1,6 +1,10 @@
 # Global Temperature Anomaly Prediction
 
 This project implements a machine learning model to predict global temperature anomalies based on various environmental factors. The project consists of a machine learning model, a FastAPI backend, and a Flutter frontend application.
+## App UI Design
+image.png
+
+
 
 ## Project Structure
 ```
@@ -84,4 +88,4 @@ The Linear Regression model was chosen as the best performing model based on:
 - Simpler model architecture suitable for the linear nature of temperature anomaly predictions
 
 ## Video Demo
-[Video link will be added] 
+[Demo Video](https://docs.google.com/document/d/13s9qF54S_UDDHkaU5DtYedcdbeR6waaSgwVnuCjj-v0/edit?usp=sharing)
